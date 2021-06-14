@@ -1,0 +1,12 @@
+<library path="src">
+  <class name="rqt rosparam" type="rqt_rosparam.rqt_rosparam.MyPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <label>rqt_rosparam</label>
+      <icon type="theme">system-help</icon>
+      <statustip>View and modify parameters on the ros parameter server or in yaml files.</statustip>
+    </qtgui>
+  </class>
+</library>
