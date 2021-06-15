@@ -1,5 +1,5 @@
 <library path="src">
-  <class name="rqt rosparam" type="rqt_rosparam.rqt_rosparam.MyPlugin" base_class_type="rqt_gui_py::Plugin">
+  <class name="rqt rosparam" type="rqt_rosparam.rqt_rosparam.RqtRosParam" base_class_type="rqt_gui_py::Plugin">
     <description>
       An example Python GUI plugin to create a great user interface.
     </description>

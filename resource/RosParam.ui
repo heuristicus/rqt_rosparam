@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>523</width>
+    <width>541</width>
     <height>500</height>
    </rect>
   </property>
@@ -15,10 +15,34 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="filterEntry"/>
    </item>
    <item>
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="QTreeView" name="paramTree"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="setParamKeyEdit"/>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="setParamValueEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="setParamButton">
+       <property name="text">
+        <string>Set</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="feedbackLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

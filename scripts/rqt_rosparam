@@ -2,7 +2,7 @@
 
 import sys
 
-from rqt_rosparam.rqt_rosparam import MyPlugin
+from rqt_rosparam.rqt_rosparam import RqtRosParam
 from rqt_gui.main import Main
 
 plugin = 'rqt_rosparam'
