@@ -44,8 +44,12 @@ class RqtRosParam(Plugin):
             self._set_param
         )
 
-        self._param_name_edit = self._widget.findChildren(QLineEdit, "setParamKeyEdit")[0]
-        self._param_value_edit = self._widget.findChildren(QLineEdit, "setParamValueEdit")[0]
+        self._param_name_edit = self._widget.findChildren(QLineEdit, "setParamKeyEdit")[
+            0
+        ]
+        self._param_value_edit = self._widget.findChildren(
+            QLineEdit, "setParamValueEdit"
+        )[0]
 
         self._param_tree = self._widget.findChildren(QTreeView, "paramTree")[0]
         self._filter_box = self._widget.findChildren(QLineEdit, "filterEntry")[0]
@@ -144,9 +148,7 @@ class RqtRosParam(Plugin):
             except TypeError as e:
                 rospy.logerr("Failed to set param {}: {}".format(parameter, e))
 
-        # TODO: Maybe instead of refreshing just add the lines to the model manually here, probably unnecessary
-        #  effort to refresh everything when adding a new param
-        self.refresh()
+        self._add_dict_to_tree({parameter: self._param_value_edit.text()}, self._model.invisibleRootItem())
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
