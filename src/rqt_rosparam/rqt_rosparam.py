@@ -5,7 +5,6 @@ import rosparam
 import yaml
 
 from collections.abc import Mapping
-from argparse import ArgumentParser
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import (
@@ -43,30 +42,15 @@ class RqtRosParam(Plugin):
                 self._widget.windowTitle() + (" (%d)" % context.serial_number())
             )
 
-        self._widget.findChildren(QPushButton, "refreshButton")[0].clicked.connect(
-            self.refresh
-        )
-        self._widget.findChildren(QPushButton, "setParamButton")[0].clicked.connect(
-            self._set_param
-        )
-
-        self._param_name_edit = self._widget.findChildren(QLineEdit, "setParamKeyEdit")[
-            0
-        ]
-        self._param_value_edit = self._widget.findChildren(
-            QLineEdit, "setParamValueEdit"
-        )[0]
-        self._feedback_label = self._widget.findChildren(QLabel, "feedbackLabel")[0]
-
-        self._param_tree = self._widget.findChildren(QTreeView, "paramTree")[0]
-        self._filter_box = self._widget.findChildren(QLineEdit, "filterEntry")[0]
-
         self._model = QStandardItemModel()
 
         # Set up the model used for sorting and filtering the fields
         self._sort_model = QSortFilterProxyModel()
         self._sort_model.setSourceModel(self._model)
+        # If a child matches, show the parent. TODO: Must also add something to show all children when a parent matches
         self._sort_model.setRecursiveFilteringEnabled(True)
+
+        self._param_tree = self._widget.findChildren(QTreeView, "paramTree")[0]
         self._param_tree.setModel(self._sort_model)
 
         self._widget.findChildren(QLineEdit, "filterEntry")[0].textChanged.connect(
@@ -78,6 +62,26 @@ class RqtRosParam(Plugin):
         self._param_tree.header().setSectionsMovable(False)
         self._param_tree.header().setDefaultSectionSize(200)
         self._param_tree.setSortingEnabled(True)
+
+        self._widget.findChildren(QPushButton, "refreshButton")[0].clicked.connect(
+            self.refresh
+        )
+        self._widget.findChildren(QPushButton, "setParamButton")[0].clicked.connect(
+            self._set_param_from_button
+        )
+        self._widget.findChildren(QPushButton, "collapseButton")[0].clicked.connect(
+            self._param_tree.collapseAll
+        )
+        self._widget.findChildren(QPushButton, "expandButton")[0].clicked.connect(
+            self._param_tree.expandAll
+        )
+        self._param_name_edit = self._widget.findChildren(QLineEdit, "setParamKeyEdit")[
+            0
+        ]
+        self._param_value_edit = self._widget.findChildren(
+            QLineEdit, "setParamValueEdit"
+        )[0]
+        self._feedback_label = self._widget.findChildren(QLabel, "feedbackLabel")[0]
 
         self.refresh()
 
@@ -149,7 +153,7 @@ class RqtRosParam(Plugin):
         # Get the parameter name by getting the modelIndex of the sibling on this row at column 0, which is the
         # parameter column
         parameter = self._reconstruct_param_name(item.index().siblingAtColumn(0))
-        rosparam.set_param(parameter, new_value)
+        self._set_param(parameter, new_value)
 
     def _set_feedback(self, message):
         """
@@ -159,17 +163,19 @@ class RqtRosParam(Plugin):
         """
         self._feedback_label.setText(message)
 
-    def _set_param(self):
+    def _set_param(self, parameter, value):
+        try:
+            rospy.set_param(parameter, value)
+        except TypeError as e:
+            message = "Failed to set param {}: {}".format(parameter, e)
+            rospy.logerr(message)
+            self._set_feedback(message)
+
+    def _set_param_from_button(self):
         # If there is no param name set we can't do anything
         parameter = self._param_name_edit.text()
         if parameter:
-            try:
-                rosparam.set_param(parameter, self._param_value_edit.text())
-            except TypeError as e:
-                message = "Failed to set param {}: {}".format(parameter, e)
-                rospy.logerr(message)
-                self._set_feedback(message)
-
+            self._set_param(parameter, self._param_value_edit.text())
             self._add_dict_to_tree(
                 {parameter: self._param_value_edit.text()},
                 self._model.invisibleRootItem(),

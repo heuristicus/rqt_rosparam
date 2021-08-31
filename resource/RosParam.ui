@@ -15,11 +15,41 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QPushButton" name="refreshButton">
-     <property name="text">
-      <string>Refresh</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="buttonsLayout">
+     <item>
+      <widget class="QPushButton" name="refreshButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Refresh</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="collapseButton">
+       <property name="toolTip">
+        <string>Collapse tree</string>
+       </property>
+       <property name="text">
+        <string>Collapse</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="expandButton">
+       <property name="toolTip">
+        <string>Expand tree</string>
+       </property>
+       <property name="text">
+        <string>Expand</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QLineEdit" name="filterEntry">
@@ -32,7 +62,7 @@
     <widget class="QTreeView" name="paramTree"/>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="setParamLayout">
      <item>
       <widget class="QLineEdit" name="setParamKeyEdit">
        <property name="placeholderText">
