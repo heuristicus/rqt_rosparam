@@ -22,7 +22,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="filterEntry"/>
+    <widget class="QLineEdit" name="filterEntry">
+     <property name="placeholderText">
+      <string>Filter parameters</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QTreeView" name="paramTree"/>
@@ -30,10 +34,18 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="setParamKeyEdit"/>
+      <widget class="QLineEdit" name="setParamKeyEdit">
+       <property name="placeholderText">
+        <string>Parameter</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="setParamValueEdit"/>
+      <widget class="QLineEdit" name="setParamValueEdit">
+       <property name="placeholderText">
+        <string>Value</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="setParamButton">
