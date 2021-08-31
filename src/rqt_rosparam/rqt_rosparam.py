@@ -66,7 +66,12 @@ class RqtRosParam(Plugin):
         # Set up the model used for sorting and filtering the fields
         self._sort_model = QSortFilterProxyModel()
         self._sort_model.setSourceModel(self._model)
+        self._sort_model.setRecursiveFilteringEnabled(True)
         self._param_tree.setModel(self._sort_model)
+
+        self._widget.findChildren(QLineEdit, "filterEntry")[0].textChanged.connect(
+            self._sort_model.setFilterFixedString
+        )
 
         self._model.setHorizontalHeaderLabels(["Parameter", "Value"])
         # There are only two sections so they can't be moved anyway
