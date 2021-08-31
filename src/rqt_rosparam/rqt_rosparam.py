@@ -20,6 +20,9 @@ import python_qt_binding.QtCore as QtCore
 
 
 class RqtRosParam(Plugin):
+
+    VALUE_LENGTH_LIMIT = 1000
+
     def __init__(self, context):
         super(RqtRosParam, self).__init__(context)
         self.setObjectName("rqt_rosparam")
@@ -111,12 +114,18 @@ class RqtRosParam(Plugin):
             if isinstance(value, Mapping):
                 new_row = QStandardItem(key)
                 parent_item.appendRow(new_row)
-                # Get the row we just added so we can use it as a parent for the dictionary
                 self._add_dict_to_tree(value, new_row)
             else:
                 # Can't handle lists so convert to string
                 data_type = type(value)
                 value = str(value)
+                if len(value) > RqtRosParam.VALUE_LENGTH_LIMIT:
+                    # truncate super long strings (like robot_description)
+                    value = value[
+                        : RqtRosParam.VALUE_LENGTH_LIMIT
+                    ] + "...(this param was truncated as it is over {} chars long)".format(
+                        RqtRosParam.VALUE_LENGTH_LIMIT
+                    )
                 parent_item.appendRow([QStandardItem(key), QStandardItem(value)])
                 # Try to indicate that the actual content of this object is a list, so we can convert it back later
                 row = parent_item.child(parent_item.rowCount() - 1)
