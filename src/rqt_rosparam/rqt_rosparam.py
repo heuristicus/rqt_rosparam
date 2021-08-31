@@ -40,8 +40,16 @@ class RqtRosParam(Plugin):
         self._widget.findChildren(QPushButton, "refreshButton")[0].clicked.connect(
             self.refresh
         )
+        self._widget.findChildren(QPushButton, "setParamButton")[0].clicked.connect(
+            self._set_param
+        )
+
+        self._param_name_edit = self._widget.findChildren(QLineEdit, "setParamKeyEdit")[0]
+        self._param_value_edit = self._widget.findChildren(QLineEdit, "setParamValueEdit")[0]
+
         self._param_tree = self._widget.findChildren(QTreeView, "paramTree")[0]
         self._filter_box = self._widget.findChildren(QLineEdit, "filterEntry")[0]
+
         self._model = QStandardItemModel()
 
         # Set up the model used for sorting and filtering the fields
@@ -58,7 +66,7 @@ class RqtRosParam(Plugin):
         self.refresh()
 
         context.add_widget(self._widget)
-        self._model.itemChanged.connect(self.model_item_changed)
+        self._model.itemChanged.connect(self._model_item_changed)
 
     def refresh(self):
         """Refresh the model display by getting yaml parameters from the parameter server"""
@@ -118,7 +126,7 @@ class RqtRosParam(Plugin):
             # Otherwise, we continue with the reconstruction by passing the parent index
             return self._reconstruct_param_name(parent.index(), param_name)
 
-    def model_item_changed(self, item):
+    def _model_item_changed(self, item):
         """Called when the user modifies a parameter value"""
         # Must use the DisplayRole otherwise just returns none
         new_value = item.data(QtCore.Qt.DisplayRole)
@@ -126,6 +134,19 @@ class RqtRosParam(Plugin):
         # parameter column
         parameter = self._reconstruct_param_name(item.index().siblingAtColumn(0))
         rosparam.set_param(parameter, new_value)
+
+    def _set_param(self):
+        # If there is no param name set we can't do anything
+        parameter = self._param_name_edit.text()
+        if parameter:
+            try:
+                rosparam.set_param(parameter, self._param_value_edit.text())
+            except TypeError as e:
+                rospy.logerr("Failed to set param {}: {}".format(parameter, e))
+
+        # TODO: Maybe instead of refreshing just add the lines to the model manually here, probably unnecessary
+        #  effort to refresh everything when adding a new param
+        self.refresh()
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
