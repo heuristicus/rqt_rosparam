@@ -106,7 +106,7 @@ class RqtRosParam(Plugin):
         """
         Add a dict to a model item, recursively
         :param value_dict: A dictionary
-        :param parent_item: The model item to add the dict to
+        :param parent_item: Model item to which the dict will be added
         :return:
         """
         for key, value in value_dict.items():
@@ -138,9 +138,9 @@ class RqtRosParam(Plugin):
         This is necessary because the tree is constructed such that each namespace is on a new row
         Uses recursion to go up the model tree and add the namespace names of each row
 
-        :param model_index: The model index of the parameter name to reconstruct
-        :param param_name: The currently built name of the parameter
-        :return: The full name of the parameter
+        :param model_index: Model index of the parameter name to reconstruct
+        :param param_name: Currently built name of the parameter
+        :return: Full name of the parameter
         """
         # The current model index is the name of the namespace which contains the parameter name or sub-namespace
         param_name = self._model.data(model_index, QtCore.Qt.DisplayRole) + (
@@ -167,12 +167,18 @@ class RqtRosParam(Plugin):
     def _set_feedback(self, message):
         """
         Set the message to display in the feedback label
-        :param message: The message to display
+        :param message: Message to display
         :return:
         """
         self._feedback_label.setText(message)
 
     def _set_param(self, parameter, value):
+        """
+        Set the parameter
+        :param parameter: String representing the parameter. Slashes indicate namespacing
+        :param value: Value of the parameter
+        :return: Dict representation of the parameter
+        """
         try:
             rospy.set_param(parameter, value)
         except TypeError as e:
@@ -180,12 +186,44 @@ class RqtRosParam(Plugin):
             rospy.logerr(message)
             self._set_feedback(message)
 
+        return self._param_string_to_dict(parameter, value)
+
+    def _param_string_to_dict(self, parameter, value):
+        """
+        Convert a string representation of a namespaced parameter to a dict representation where each namespace is a
+        dictionary layer
+
+        :param parameter: String parameter to convert to dict
+        :param value: Value of the parameter
+        :return: Dict representation of the parameter and value. The dict follows the namespacing structure
+        """
+        # Strip leading and trailing slashes and then get each namespace by splitting
+        param_namespaces = parameter.strip("/").split("/")
+        if len(param_namespaces) == 1:
+            param_dict = {parameter: value}
+        else:
+            param_dict = {}
+            current_dict = {}
+            # Generate the first layer of the dictionary
+            param_dict[param_namespaces[0]] = current_dict
+            # Loop over any more namespaces and layer them into the dictionary
+            for param in param_namespaces[1:-1]:
+                current_dict[param] = {}
+                current_dict = current_dict[param]
+
+            # Last layer is the actual parameter name and value
+            current_dict[param_namespaces[-1]] = value
+
+        return param_dict
+
     def _set_param_from_button(self):
         # If there is no param name set we can't do anything
         parameter = self._param_name_edit.text()
         if parameter:
-            self._set_param(parameter, self._param_value_edit.text())
+            param_dict = self._set_param(parameter, self._param_value_edit.text())
+            # TODO: We could just refresh the whole thing here and remove need for anti-duplication code,
+            #  does it ever take a long time?
             self._add_dict_to_tree(
-                {parameter: self._param_value_edit.text()},
+                param_dict,
                 self._model.invisibleRootItem(),
             )
