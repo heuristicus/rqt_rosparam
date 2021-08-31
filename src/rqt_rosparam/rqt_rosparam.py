@@ -106,7 +106,7 @@ class RqtRosParam(Plugin):
         """
         Add a dict to a model item, recursively
         :param value_dict: A dictionary
-        :param parent_item: The model item to add the dict to
+        :param parent_item: Model item to which the dict should be added
         :return:
         """
         for key, value in value_dict.items():
@@ -138,9 +138,9 @@ class RqtRosParam(Plugin):
         This is necessary because the tree is constructed such that each namespace is on a new row
         Uses recursion to go up the model tree and add the namespace names of each row
 
-        :param model_index: The model index of the parameter name to reconstruct
-        :param param_name: The currently built name of the parameter
-        :return: The full name of the parameter
+        :param model_index: Model index of the parameter name to reconstruct
+        :param param_name: Currently built name of the parameter
+        :return: Full name of the parameter
         """
         # The current model index is the name of the namespace which contains the parameter name or sub-namespace
         param_name = self._model.data(model_index, QtCore.Qt.DisplayRole) + (
@@ -167,12 +167,18 @@ class RqtRosParam(Plugin):
     def _set_feedback(self, message):
         """
         Set the message to display in the feedback label
-        :param message: The message to display
+        :param message: Message to display
         :return:
         """
         self._feedback_label.setText(message)
 
     def _set_param(self, parameter, value):
+        """
+        Set the parameter
+        :param parameter: String representing the parameter. Slashes indicate namespacing
+        :param value: Value of the parameter
+        :return:
+        """
         try:
             rospy.set_param(parameter, value)
         except TypeError as e:
@@ -185,7 +191,4 @@ class RqtRosParam(Plugin):
         parameter = self._param_name_edit.text()
         if parameter:
             self._set_param(parameter, self._param_value_edit.text())
-            self._add_dict_to_tree(
-                {parameter: self._param_value_edit.text()},
-                self._model.invisibleRootItem(),
-            )
+            self.refresh()
