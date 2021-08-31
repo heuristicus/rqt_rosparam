@@ -8,7 +8,13 @@ from collections.abc import Mapping
 from argparse import ArgumentParser
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QTreeView, QLineEdit, QPushButton
+from python_qt_binding.QtWidgets import (
+    QWidget,
+    QTreeView,
+    QLineEdit,
+    QPushButton,
+    QLabel,
+)
 from python_qt_binding.QtGui import QStandardItemModel, QStandardItem
 from python_qt_binding.QtCore import QSortFilterProxyModel
 import python_qt_binding.QtCore as QtCore
@@ -50,6 +56,7 @@ class RqtRosParam(Plugin):
         self._param_value_edit = self._widget.findChildren(
             QLineEdit, "setParamValueEdit"
         )[0]
+        self._feedback_label = self._widget.findChildren(QLabel, "feedbackLabel")[0]
 
         self._param_tree = self._widget.findChildren(QTreeView, "paramTree")[0]
         self._filter_box = self._widget.findChildren(QLineEdit, "filterEntry")[0]
@@ -139,6 +146,14 @@ class RqtRosParam(Plugin):
         parameter = self._reconstruct_param_name(item.index().siblingAtColumn(0))
         rosparam.set_param(parameter, new_value)
 
+    def _set_feedback(self, message):
+        """
+        Set the message to display in the feedback label
+        :param message: The message to display
+        :return:
+        """
+        self._feedback_label.setText(message)
+
     def _set_param(self):
         # If there is no param name set we can't do anything
         parameter = self._param_name_edit.text()
@@ -146,9 +161,14 @@ class RqtRosParam(Plugin):
             try:
                 rosparam.set_param(parameter, self._param_value_edit.text())
             except TypeError as e:
-                rospy.logerr("Failed to set param {}: {}".format(parameter, e))
+                message = "Failed to set param {}: {}".format(parameter, e)
+                rospy.logerr(message)
+                self._set_feedback(message)
 
-        self._add_dict_to_tree({parameter: self._param_value_edit.text()}, self._model.invisibleRootItem())
+            self._add_dict_to_tree(
+                {parameter: self._param_value_edit.text()},
+                self._model.invisibleRootItem(),
+            )
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
