@@ -180,22 +180,3 @@ class RqtRosParam(Plugin):
                 {parameter: self._param_value_edit.text()},
                 self._model.invisibleRootItem(),
             )
-
-    def shutdown_plugin(self):
-        # TODO unregister all publishers here
-        pass
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
-    def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        # v = instance_settings.value(k)
-        pass
-
-    # def trigger_configuration(self):
-    # Comment in to signal that the plugin has a way to configure
-    # This will enable a setting button (gear icon) in each dock widget title bar
-    # Usually used to open a modal configuration dialog
