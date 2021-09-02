@@ -35,11 +35,9 @@ class RqtRosParam(Plugin):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self._widget)
         self._widget.setObjectName("rqt_rosparam")
-        # Show _widget.windowTitle on left-top of each plugin (when
-        # it's set in _widget). This is useful when you open multiple
-        # plugins at once. Also if you open multiple instances of your
-        # plugin at once, these lines add number to make it easy to
-        # tell from pane to pane.
+        # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). This is useful when you
+        # open multiple plugins at once. Also if you open multiple instances of your plugin at once, these lines add
+        # number to make it easy to tell from pane to pane.
         if context.serial_number() > 1:
             self._widget.setWindowTitle(
                 self._widget.windowTitle() + (" (%d)" % context.serial_number())
@@ -53,10 +51,10 @@ class RqtRosParam(Plugin):
         # If a child matches, show the parent. TODO: Must also add something to show all children when a parent matches
         self._sort_model.setRecursiveFilteringEnabled(True)
 
-        self._param_tree = self._widget.findChildren(QTreeView, "paramTree")[0]
+        self._param_tree = self._widget.findChild(QTreeView, "paramTree")
         self._param_tree.setModel(self._sort_model)
 
-        self._widget.findChildren(QLineEdit, "filterEntry")[0].textChanged.connect(
+        self._widget.findChild(QLineEdit, "filterEntry").textChanged.connect(
             self._sort_model.setFilterFixedString
         )
 
@@ -66,25 +64,21 @@ class RqtRosParam(Plugin):
         self._param_tree.header().setDefaultSectionSize(200)
         self._param_tree.setSortingEnabled(True)
 
-        self._widget.findChildren(QPushButton, "refreshButton")[0].clicked.connect(
+        self._widget.findChild(QPushButton, "refreshButton").clicked.connect(
             self.refresh
         )
-        self._widget.findChildren(QPushButton, "setParamButton")[0].clicked.connect(
+        self._widget.findChild(QPushButton, "setParamButton").clicked.connect(
             self._set_param_from_button
         )
-        self._widget.findChildren(QPushButton, "collapseButton")[0].clicked.connect(
+        self._widget.findChild(QPushButton, "collapseButton").clicked.connect(
             self._param_tree.collapseAll
         )
-        self._widget.findChildren(QPushButton, "expandButton")[0].clicked.connect(
+        self._widget.findChild(QPushButton, "expandButton").clicked.connect(
             self._param_tree.expandAll
         )
-        self._param_name_edit = self._widget.findChildren(QLineEdit, "setParamKeyEdit")[
-            0
-        ]
-        self._param_value_edit = self._widget.findChildren(
-            QLineEdit, "setParamValueEdit"
-        )[0]
-        self._feedback_label = self._widget.findChildren(QLabel, "feedbackLabel")[0]
+        self._param_name_edit = self._widget.findChild(QLineEdit, "setParamKeyEdit")
+        self._param_value_edit = self._widget.findChild(QLineEdit, "setParamValueEdit")
+        self._feedback_label = self._widget.findChild(QLabel, "feedbackLabel")
 
         self.refresh()
 
